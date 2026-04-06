@@ -1,41 +1,33 @@
-import { promises as fs } from "fs"
-import path from "path"
-import type { Database, User, Appointment, Prescription } from "./types"
-import { seedData } from "./seed-data"
+import { kv } from "@vercel/kv";
+import type { Database, User, Appointment, Prescription } from "./types";
+import { seedData } from "./seed-data";
 
-const DB_PATH = path.join(process.cwd(), "data", "db.json") // database path
+// We no longer need path or fs because we aren't using local files!
+const DB_KEY = "zelthy_database_v1";
 
-async function ensureDataDir(): Promise<void> {
-  const dataDir = path.dirname(DB_PATH)
-  try {
-    await fs.access(dataDir)
-  } catch {
-    await fs.mkdir(dataDir, { recursive: true })
-  }
-}
-
+// 1. Updated Read function to use the Cloud
 async function readDatabase(): Promise<Database> {
-  await ensureDataDir()
   try {
-    const data = await fs.readFile(DB_PATH, "utf-8")
-    const parsed = JSON.parse(data) as Database
-    // Validate that it has the expected structure
-    if (!parsed.users || !Array.isArray(parsed.users)) {
-      // Invalid structure, reseed
-      await writeDatabase(seedData)
-      return seedData
+    const data = await kv.get<Database>(DB_KEY);
+    // If the database is empty (first time), use your seed data
+    if (!data || !data.users) {
+      await writeDatabase(seedData);
+      return seedData;
     }
-    return parsed
-  } catch {
-    // If file doesn't exist or is invalid, seed with initial data
-    await writeDatabase(seedData)
-    return seedData
+    return data;
+  } catch (error) {
+    console.error("Cloud DB Read Error:", error);
+    return seedData;
   }
 }
 
+// 2. Updated Write function to use the Cloud
 async function writeDatabase(data: Database): Promise<void> {
-  await ensureDataDir()
-  await fs.writeFile(DB_PATH, JSON.stringify(data, null, 2), "utf-8")
+  try {
+    await kv.set(DB_KEY, data);
+  } catch (error) {
+    console.error("Cloud DB Write Error:", error);
+  }
 }
 
 // User operations
