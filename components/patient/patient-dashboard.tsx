@@ -219,7 +219,7 @@ export function PatientDashboard({
               <Pill className="size-5 text-sky-600" />
               <CardTitle>Active Prescriptions</CardTitle>
 
-              {prescriptions.length !== 0 && (
+              {activePrescriptions.length !== 0 && (
                 <div className="flex items-center gap-4  ml-auto">
                   <Button variant="ghost" size="sm" asChild>
                     <Link href="/patient/prescriptions">
@@ -235,7 +235,7 @@ export function PatientDashboard({
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {prescriptions.length === 0 ? (
+            {activePrescriptions.length === 0 ? (
               <p className="text-center text-muted-foreground py-8">
                 No active prescriptions.
               </p>
