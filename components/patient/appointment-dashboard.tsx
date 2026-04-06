@@ -133,7 +133,7 @@ export function AppointmentDashboard({
                 >
                   <div className="space-y-1">
                     <p className="font-medium">{appointment.provider}</p>
-                    <div className="flex items-center gap-6 text-sm text-muted-foreground">
+                    <div className="contents md:flex md:items-center md:gap-6 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1 text-sm text-muted-foreground">
                         <Calendar className="size-3" />
                         <span>{date}</span>
@@ -150,6 +150,7 @@ export function AppointmentDashboard({
                       </div>
                     </div>
                   </div>
+
                   <Badge
                     variant="outline"
                     className={getStatusBadgeClass(
